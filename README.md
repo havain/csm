@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 For more information about the C(anonical) Scan Matcher, see the webpage: http://purl.org/censi/2007/csm .
 
 This is the "master" branch of CSM, which uses GSL.
@@ -34,3 +35,7 @@ The package name contains "ROS" specific info, but you can use this as a standal
 /opt/ros/indigo/lib/libcsm-static.a
 /opt/ros/indigo/lib/libcsm.so
 ```
+=======
+# csm
+注释csm库
+>>>>>>> 21541e5d8544c3c04ddc0ae174d882cadade010c
