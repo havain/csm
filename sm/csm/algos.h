@@ -16,6 +16,7 @@ struct sm_params {
 	LDP laser_sens;
 
 	/** Where to start */
+	//会有一个初始估计
  	double first_guess[3]; 
 
 	/** Maximum angular displacement between scans (deg)*/
@@ -23,24 +24,25 @@ struct sm_params {
 	/** Maximum translation between scans (m) */
 	double max_linear_correction;
 
-	/** When to stop */
+	/** When to stop,停止计算的三种方式:迭代次数,位移和角度阈值*/
 	int max_iterations;
 	/** A threshold for stopping. */
 	double epsilon_xy;
-	/** A threshold for stopping. */
+	/** A threshold for stopping.ε一般表示差值*/
 	double epsilon_theta;
 	
-	/** Maximum distance for a correspondence to be valid */
+	/** Maximum distance for a correspondence to be valid 最大匹配距离是多少*/
 	double max_correspondence_dist;
-	/** Use smart tricks for finding correspondences. Only influences speed; not convergence. */
+	/** Use smart tricks for finding correspondences. Only influences speed; not convergence. 加了一些tricks来加快找到对应点的速度*/
 	int use_corr_tricks;
 	
 	/** Restart if error under threshold (0 or 1)*/
+	//这里的threshold是指的？？
 	int restart;
 		/** Threshold for restarting */
 		double restart_threshold_mean_error;
 		/** Displacement for restarting */
-		double restart_dt;
+		double restart_dtsigma;
 		/** Displacement for restarting */
 		double restart_dtheta;
 	
@@ -65,17 +67,18 @@ struct sm_params {
 		double outliers_adaptive_order; /* 0.7 */
 		double outliers_adaptive_mult; /* 2 */
 
-	/** Do not allow two different correspondences to share a point */
+	/** Do not allow two different correspondences to share a point
+	 * 每个点只有一个匹配点对，这个处理在哪里？可否借鉴*/
 	int outliers_remove_doubles; 
 
-
-	
-	/* Functions that compute and use point orientation for defining matches. */
+	/* Functions that compute and DDuse point orientation for defining matches. */
 		/** For now, a very simple max-distance clustering algorithm is used */
 		double clustering_threshold;
-		/** Number of neighbour rays used to estimate the orientation.*/
+		/** Number of neighbour rays used to estimate the orientation.
+		 * 聚类找匹配点？？*/
 		int orientation_neighbourhood;
-		/** Discard correspondences based on the angles */
+		/** Discard correspondences based on the angles
+		 * 根据角度丢弃对应关系？？怎么个丢弃方法*/
 		int do_alpha_test;
 		double do_alpha_test_thresholdDeg;
 		
@@ -106,18 +109,21 @@ struct sm_params {
 	*/
 	int use_ml_weights;
 	
-	/* If 1, the field "readings_sigma" is used to weight the correspondence by 1/sigma^2 */
+	/* If 1, the field "readings_sigma" is used to weight the correspondence by 1/sigma^2
+	 * todo这里是什么原理，用权重？？？sigma表示匹配的权重？？？*/
 	int use_sigma_weights;
 	
 	/** Use the method in http://purl.org/censi/2006/icpcov to compute
 	    the matching covariance. */
 	int do_compute_covariance;
 
-	/** Checks that find_correspondences_tricks give the right answer */
+	/** Checks that find_correspondences_tricks give the right answer
+	 *todo怎么判断的？*/
 	int debug_verify_tricks;
 	
 	/** Pose of sensor with respect to robot: used for computing
-	    the first estimate given the odometry. */
+	    the first estimate given the odometry.
+	    todo:没明白，用在哪里？？？？*/
 	double laser[3]; 
 
 	/** Noise in the scan */
@@ -144,12 +150,14 @@ struct sm_result {
 	
 	/** Number of iterations done */
 	int iterations;
-	/** Number of valid correspondence in the end */
+	/** Number of valid correspondence in the end
+	 * 有效匹配的次数，有效匹配的标准是什么*/
 	int nvalid;
-	/** Total correspondence error */
+	/** Total correspondence error
+	 * 全部的匹配误差*/
 	double error;
 	
-	/** Fields used for covariance computation */
+	/** Fields used for covariance computation  计算协方差，用的是gsl库 */
 	#ifndef RUBY
 		gsl_matrix *cov_x_m;	
 		gsl_matrix *dx_dy1_m;
@@ -165,8 +173,6 @@ void sm_hsm(struct sm_params*input, struct sm_result*output);
 
 /* Unfinished, untested :-/ */
 void sm_mbcip(struct sm_params*input, struct sm_result*output);
-
-
 
 void sm_journal_open(const char* file);
 

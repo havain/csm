@@ -14,12 +14,12 @@ typedef struct {
 } point2d;
 
 struct laser_data {
+    //nrays是什么意思？
 	int nrays;
 	double  min_theta;
 	double  max_theta;
 	
 	double * restrict theta;
-	
 	int    * restrict valid;
 	double * restrict readings;
 	
@@ -40,10 +40,11 @@ struct laser_data {
 	double estimate[3];	
 	
 
-	/** Cartesian representation */
+	/** Cartesian representation 笛卡尔坐标系下的点 */
 	point2d *  restrict points;
 	/** Cartesian representation, in "world" (laser_ref) coordinates. 
-	    Computed using ld_compute_world_coords() */
+	    Computed using ld_compute_world_coords()
+	    世界坐标系下的点*/
 	point2d *  restrict points_w;
 
 	/** Timestamp */
@@ -101,15 +102,15 @@ unsigned int ld_corr_hash(LDP);
 int ld_num_valid_correspondences(LDP);
 
 /** Do an extensive sanity check about the data contained in the structure. */
+//数据有效性检查
 int ld_valid_fields(LDP);
 
 /** A simple clustering algorithm. Sets the `cluster' field in the structure. */
+//简单的聚类算法
 void ld_simple_clustering(LDP ld, double threshold);
 
 /** A cool orientation estimation algorithm. Needs cluster. */
 void ld_compute_orientation(LDP ld, int size_neighbourhood, double sigma);
-
-
 
 
 /** 

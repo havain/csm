@@ -16,8 +16,9 @@ int icp_loop(struct sm_params*params, const double*q0, double*x_new,
 		sm_error("icp_loop: Initial pose contains nan: %s\n", friendly_pose(q0));
 		return 0;
 	}
-		
-		
+
+
+	//设置的这些变量都是啥用途
 	LDP laser_sens = params->laser_sens;
 	double x_old[3], delta[3], delta_old[3] = {0,0,0};
 	copy_d(q0, 3, x_old);
@@ -25,11 +26,15 @@ int icp_loop(struct sm_params*params, const double*q0, double*x_new,
 	int iteration;
 	
 	sm_debug("icp: starting at  q0 =  %s  \n", friendly_pose(x_old));
-	
+
+
+	//json字符?不管他
 	if(JJ) jj_loop_enter("iterations");
 	
 	int all_is_okay = 1;
-	
+
+
+	//进入迭代
 	for(iteration=0; iteration<params->max_iterations;iteration++) {
 		if(JJ) jj_loop_iteration();
 		if(JJ) jj_add_double_array("x_old", x_old, 3);
@@ -39,6 +44,8 @@ int icp_loop(struct sm_params*params, const double*q0, double*x_new,
 
 		/** Compute laser_sens's points in laser_ref's coordinates
 		    by roto-translating by x_old */
+
+		//把x_old点通过转移矩阵转换到参考帧坐标系下
 		ld_compute_world_coords(laser_sens, x_old);
 
 		/** Find correspondences (the naif or smart way) */
@@ -48,7 +55,8 @@ int icp_loop(struct sm_params*params, const double*q0, double*x_new,
 			find_correspondences(params);
 
 		/** If debug_verify_tricks, make sure that find_correspondences_tricks()
-		    and find_correspondences() return the same answer */
+		    and find_correspondences() return the same answer
+		    tricks是否有效，通过使用tricks和未使用tricks的匹配结果是否一致*/
 			if(params->debug_verify_tricks)
 				debug_correspondences(params);
 

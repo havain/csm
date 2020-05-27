@@ -16,10 +16,11 @@ void sm_journal_open(const char* file) {
 /*	journal_open(file);*/
 }
 
+//对屏蔽角度的点进行了处理；目前激光驱动里面改角度时，会把屏蔽角度的值设置为inf（无限大）,这里数据进行预处理是很有作用的
 void ld_invalid_if_outside(LDP ld, double min_reading, double max_reading) {
 	int i;
 	for(i=0;i<ld->nrays;i++) {
-		if(!ld_valid_ray(ld, i)) continue;
+		if(!ld_valid_ray(ld, i)) continue;  //先判断数据是不是有效的,再判断是不是不在范围内
 		double r = ld->readings[i];
 		if( r <= min_reading || r > max_reading)
 			ld->valid[i] = 0;
@@ -27,21 +28,23 @@ void ld_invalid_if_outside(LDP ld, double min_reading, double max_reading) {
 }
 
 void sm_icp(struct sm_params*params, struct sm_result*res) {
+    //初始时结果无效
 	res->valid = 0;
 
 	LDP laser_ref  = params->laser_ref;
 	LDP laser_sens = params->laser_sens;
-	
+
+	//数据有效性检查，转换的激光数据不对，则退出
 	if(!ld_valid_fields(laser_ref) || 
 	   !ld_valid_fields(laser_sens)) {
 		return;
 	}
-	
+
+	//无效数据所占的比例
 	sm_debug("sm_icp: laser_sens has %d/%d; laser_ref has %d/%d rays valid\n",
 		count_equal(laser_sens->valid, laser_sens->nrays, 1), laser_sens->nrays,
 		count_equal(laser_ref->valid, laser_ref->nrays, 1), laser_ref->nrays);
-	
-	
+
 	/** Mark as invalid the rays outside of (min_reading, max_reading] */
 	ld_invalid_if_outside(laser_ref, params->min_reading, params->max_reading);
 	ld_invalid_if_outside(laser_sens, params->min_reading, params->max_reading);
@@ -58,7 +61,9 @@ void sm_icp(struct sm_params*params, struct sm_result*res) {
 			
 	if(params->use_corr_tricks || params->debug_verify_tricks)
 		ld_create_jump_tables(laser_ref);
-		
+
+
+	//这个计算是干啥
 	ld_compute_cartesian(laser_ref);
 	ld_compute_cartesian(laser_sens);
 
@@ -97,7 +102,6 @@ void sm_icp(struct sm_params*params, struct sm_result*res) {
 		
 	} else {
 		/* It was succesfull */
-
 		int restarted = 0;		
 		double best_error = error;
 		gsl_vector * best_x = gsl_vector_alloc(3);

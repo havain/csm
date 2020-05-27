@@ -4,7 +4,7 @@
 #include "../csm_all.h"
 
 /** This is very close (but *less* than) to sin(x), for 
-    x in (0, PI/2). It's a 5� degree taylor expansion. */
+    x in (0, PI/2). It's a 5� degree taylor expansion. */
 INLINE double mysin(double x) {
 	const double a = -1.0/6.0;
 	const double b = +1.0/120.0;
@@ -58,8 +58,9 @@ void find_correspondences_tricks(struct sm_params*params) {
 	const LDP laser_sens = params->laser_sens;
 	int i;
 	
-	/* Handy constant */
+	/* Handy constant 常数 */
 	double C1 =  (double)laser_ref->nrays / (laser_ref->max_theta-laser_ref->min_theta) ;
+	//平方
 	double max_correspondence_dist2 = square(params->max_correspondence_dist);
 	/* Last match */
 	int last_best = -1;
